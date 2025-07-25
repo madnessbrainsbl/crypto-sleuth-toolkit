@@ -1,0 +1,141 @@
+# GDB скрипт для анализа криптографических функций
+# Автоматически сгенерирован для поиска SECRET_KEY
+
+# Запуск: gdb ./unlock
+# (gdb) source gdb_crypto_script.txt
+
+# ========== BREAKPOINTS НА КРИПТОФУНКЦИИ ==========
+break *0x10d54c
+commands
+printf "\n🎯 HIT: crypto_handler_1_case3_true at 0x10d54c\n"
+info registers
+bt 5
+printf "Arguments:\n"
+info args
+printf "\nMemory dump around RDI (param_1):\n"
+x/32x $rdi
+printf "\nContinuing...\n"
+continue
+end
+
+break *0x10d5c4
+commands
+printf "\n🎯 HIT: crypto_handler_2_case3_false at 0x10d5c4\n"
+info registers
+bt 5
+printf "Arguments:\n"
+info args
+printf "\nMemory dump around RDI (param_1):\n"
+x/32x $rdi
+printf "\nContinuing...\n"
+continue
+end
+
+break *0x109ac4
+commands
+printf "\n🎯 HIT: crypto_handler_3_other_true at 0x109ac4\n"
+info registers
+bt 5
+printf "Arguments:\n"
+info args
+printf "\nMemory dump around RDI (param_1):\n"
+x/32x $rdi
+printf "\nContinuing...\n"
+continue
+end
+
+break *0x10d8e4
+commands
+printf "\n🎯 HIT: crypto_handler_4_other_false at 0x10d8e4\n"
+info registers
+bt 5
+printf "Arguments:\n"
+info args
+printf "\nMemory dump around RDI (param_1):\n"
+x/32x $rdi
+printf "\nContinuing...\n"
+continue
+end
+
+# ========== BREAKPOINT НА ОСНОВНОЙ ПАРСЕР ==========
+break *0x103994
+commands
+printf "\n🔍 HIT: Main parser FUN_00103994\n"
+printf "Parameters:\n"
+printf "  param_1 (RDI): 0x%lx\n", $rdi
+printf "  param_2 (RSI): 0x%lx\n", $rsi
+printf "  param_3 (RDX): %lu\n", $rdx
+printf "\nCritical memory areas:\n"
+printf "  main_data_buffer (+0x5db4): "
+x/8x $rdi+0x5db4
+printf "  alt_buffer (+0x142c): "
+x/8x $rdi+0x142c
+printf "  magic_buffer_0x800 (+0x5430): "
+x/8x $rdi+0x5430
+printf "  data_pointer (+0x5d00): "
+x/8x $rdi+0x5d00
+printf "  data_size (+0x5d20): "
+x/8x $rdi+0x5d20
+printf "  context_pointer (+0x18): "
+x/8x $rdi+0x18
+printf "  status_flag (+0x5c90): "
+x/8x $rdi+0x5c90
+continue
+end
+
+# ========== ПОЛЬЗОВАТЕЛЬСКИЕ ФУНКЦИИ ==========
+define dump_crypto_buffers
+printf "\n📊 DUMP CRYPTO BUFFERS:\n"
+printf "\nmain_data_buffer (+0x5db4):\n"
+x/32x $rdi+0x5db4
+printf "\nalt_buffer (+0x142c):\n"
+x/32x $rdi+0x142c
+printf "\nmagic_buffer_0x800 (+0x5430):\n"
+x/32x $rdi+0x5430
+printf "\ndata_pointer (+0x5d00):\n"
+x/32x $rdi+0x5d00
+printf "\ndata_size (+0x5d20):\n"
+x/32x $rdi+0x5d20
+printf "\ncontext_pointer (+0x18):\n"
+x/32x $rdi+0x18
+printf "\nstatus_flag (+0x5c90):\n"
+x/32x $rdi+0x5c90
+end
+
+define dump_strings_around_rdi
+printf "\n🔤 STRINGS AROUND RDI:\n"
+x/20s $rdi-1000
+x/20s $rdi
+x/20s $rdi+1000
+end
+
+define search_hmac_constants
+printf "\n🔍 SEARCHING FOR HMAC CONSTANTS:\n"
+# Поиск HMAC padding (0x36 и 0x5c)
+find $rdi, $rdi+0x10000, 0x36363636
+find $rdi, $rdi+0x10000, 0x5c5c5c5c
+# Поиск SHA-256 констант
+find $rdi, $rdi+0x10000, 0x6a09e667
+find $rdi, $rdi+0x10000, 0xbb67ae85
+end
+
+define monitor_case3_flag
+printf "\n🚨 CASE 3 FLAG MONITOR:\n"
+printf "Status flag (+0x5c90): "
+x/w $rdi+0x5c90
+if (*(int*)($rdi+0x5c90) == 0)
+printf "⚠️  FLAG IS ZERO - CASE 3 CONDITION MET!\n"
+else
+printf "✅ Flag is non-zero\n"
+end
+end
+
+# ========== КОМАНДЫ ЗАПУСКА ==========
+printf "\n🚀 GDB CRYPTO ANALYSIS LOADED\n"
+printf "Available commands:\n"
+printf "  dump_crypto_buffers - дамп всех буферов\n"
+printf "  dump_strings_around_rdi - поиск строк\n"
+printf "  search_hmac_constants - поиск HMAC констант\n"
+printf "  monitor_case3_flag - проверка флага case 3\n"
+printf "\nTo start analysis, run with working token:\n"
+printf "  run eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZWhpY2xlX2lkIjoiMGQ3OWZmMDQ3ZjVjZWM1YmYyZWMyZWM3ZDNlNDY0Y2UiLCJpc3MiOiJDdW5CQSIsInRpbWVzdGFtcCI6MTc1MzA5NjIwMn0.MWlqDVyQK4lhpZNZgaBS6gHisirYceGIxWvb9Q1-zXw\n"
