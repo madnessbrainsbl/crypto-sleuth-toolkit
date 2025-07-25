@@ -7,7 +7,6 @@ A comprehensive collection of cryptographic analysis tools, scripts, and documen
 ```
 crypto-sleuth-toolkit/
 ├── CryKeX/          # CryKeX tool for cryptographic key extraction
-├── docs/            # Documentation and references
 ├── scripts/         # Collection of analysis scripts
 │   ├── JWT analysis tools
 │   ├── Binary analysis tools
@@ -30,9 +29,6 @@ The main collection of Python, JavaScript, and PowerShell scripts for:
 - Static and dynamic analysis of encryption implementations
 - Frida scripts for runtime cryptography hooking
 - Cross-platform tools for Windows and QNX systems
-
-### Documentation
-Comprehensive documentation for using the various tools and understanding cryptographic analysis techniques.
 
 ### Tools
 Additional utilities and configuration files for advanced analysis.
